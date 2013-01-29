@@ -14,7 +14,7 @@ public class TheClient {
 
 
 	
-    private final static byte CLA_TEST				= (byte)0x90;
+    private final static byte CLA_TEST				= 			(byte)0x90;
     private final static byte INS_TESTDES_ECB_NOPAD_ENC       	= (byte)0x28;
     private final static byte INS_TESTDES_ECB_NOPAD_DEC       	= (byte)0x29;
     private final static byte INS_DES_ECB_NOPAD_ENC           	= (byte)0x20;
@@ -184,22 +184,16 @@ public class TheClient {
 
     private byte[] cipherGeneric( byte typeINS, byte[] challenge ) {
 	    byte[] result = new byte[challenge.length];
-		result = challenge;
-	    // TO COMPLETE
-		byte[] cmd_ = {CLA_TEST,typeINS,P1_EMPTY,P1_EMPTY,(byte)challenge.length};		
-		byte[] apdu = new byte[cmd_.length + result.length + 1];		
-		System.arraycopy(cmd_, 0, apdu, 0, cmd_.length);
-		System.arraycopy(result, 0, apdu, cmd_.length, result.length);
-		byte[] tmp= new byte[1];
-		tmp[0]=(byte)challenge.length;
-		System.arraycopy(tmp, 0, apdu, cmd_.length+result.length, 1);
+	    byte[] header = {CLA_TEST,typeINS,P1_EMPTY,P1_EMPTY,(byte)challenge.length};		
+		byte[] apdu = new byte[header.length + result.length + 1];	
+		System.arraycopy(header, 0, apdu, 0, header.length);
+		System.arraycopy(challenge, 0, apdu, header.length, result.length);		
+		apdu[apdu.length-1]=(byte)challenge.length;
 		CommandAPDU cmd = new CommandAPDU( apdu );
-		displayAPDU(cmd);
 		ResponseAPDU resp = this.sendAPDU( cmd, DISPLAY );
-		 //return result = resp.getBytes();
-		 System.arraycopy(resp.getBytes(), 0, result, 0, (byte)(resp.getBytes().length-2));
-		 return result;
-	    //return result = copyOfRange(resp.getBytes(),(int)0,(int)(resp.getBytes().length-2));
+	    byte[] bytes = resp.getBytes();
+		System.arraycopy(bytes, 0, result,0 , bytes.length-2);
+	    return result;
     }
     
     

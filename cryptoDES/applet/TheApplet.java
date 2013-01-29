@@ -150,12 +150,11 @@ public class TheApplet extends Applet {
 	private void cipherGeneric( APDU apdu, Cipher cipher, short keyLength ) {
 		// Write the method ciphering/unciphering data from the computer.
 		// The result is sent back to the computer.
+		
 		apdu.setIncomingAndReceive();
 		byte[] buffer = apdu.getBuffer();
-		//cipher.doFinal( obj orgin, offset start, size, obj dest, dest obj offset);
-		byte length = buffer[4];
-		cipher.doFinal( buffer, (short)5, (short)buffer[4], buffer, (short)0 );
-		apdu.setOutgoingAndSend( (short)0, length);
+		cipher.doFinal( buffer, (short)5, buffer[4], buffer, (short)5 );
+		apdu.setOutgoingAndSend( (short)5, buffer[4]);
 	}
 
 
